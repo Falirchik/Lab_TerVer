@@ -34,8 +34,9 @@ def FN(x, SV, N):
 def Fk(y, sigma):
     return math.sqrt(2 * sigma ** 2 * (-1) * math.log(1 - y))
 
-def F(y,sigma):
-    return 1 - math.exp(-y**2/(2*sigma**2))
+
+def F(y, sigma):
+    return 1 - math.exp(-y ** 2 / (2 * sigma ** 2))
 
 
 # плотность
@@ -56,8 +57,9 @@ def SampleVariance(X, N, xm):  # выборочная дисперсия
         tmp += (X[i] - xm) ** 2
     return tmp / N
 
+
 def Median(sigma):
-    return sigma*math.sqrt(math.log(4))
+    return sigma * math.sqrt(math.log(4))
 
 
 def SampleMedian(X, N):  # выборочная медиана
@@ -102,32 +104,36 @@ column_list = ["Математическое ожидание (En)", "Выбор
                "Выборочная дисперсия (S2)", "|Dn - S2|", "Выборочная медиана", "Размах выборки"]
 print(tabulate(value_list, column_list, tablefmt="grid"))
 
+
 def Fn(x):
-    if x <= SV[0]: #нет элементов меньше, чем такой x
+    if x <= SV[0]:  # нет элементов меньше, чем такой x
         return 0
     else:
-        for i in range(N-1):
-            if x<= SV[i+1]:
-                return (1.*(i+1)/N)
-            if x>SV[-1]:
+        for i in range(N - 1):
+            if x <= SV[i + 1]:
+                return (1. * (i + 1) / N)
+            if x > SV[-1]:
                 return 1
-        if x>SV[-1]:
+        if x > SV[-1]:
             return 1
-x_end = float(input("Введите правую границу оси Х: "))
+
+
+# x_end = float(input("Введите правую границу оси Х: "))
+x_end = SV[N - 1]
 x1 = np.linspace(0, x_end, 1000)
 
-Dmer=0
-SVmax=0
-MaxD=0
-for i in range(0,1000):
-    MaxD=abs(Fn(x1[i])-F(x1[i],sigma))
-    if(MaxD>=Dmer):
-        Dmer=MaxD
-        SVmax=x1[i]
-print("Мера расхождения функций распределения =  ",Dmer)
+Dmer = 0
+SVmax = 0
+MaxD = 0
+for i in range(0, 1000):
+    MaxD = abs(Fn(x1[i]) - F(x1[i], sigma))
+    if (MaxD >= Dmer):
+        Dmer = MaxD
+        SVmax = x1[i]
+print("Мера расхождения функций распределения =  ", Dmer)
 
 plt.plot(x1, [Fn(i) for i in x1], color='red')
-plt.plot(x1, [F(i,sigma) for i in x1], color='blue')
+plt.plot(x1, [F(i, sigma) for i in x1], color='blue')
 plt.legend(['F^(x)', 'F(x)'], loc=2)
 plt.grid()
 plt.show()
@@ -141,18 +147,26 @@ for i in range(A + 1):
     else:
         print("Введите правую границу последнего отрезка:")
     boards[i] = float(input())
-fn = [n_in_segmet(SV,N,boards[i-1],boards[i])/(N * (boards[i] - boards[i-1])) for i in range(1, A + 1)]
+fn = [n_in_segmet(SV, N, boards[i - 1], boards[i]) / (N * (boards[i] - boards[i - 1])) for i in range(1, A + 1)]
 z = [(boards[i] + boards[i - 1]) / 2 for i in range(1, A + 1)]
 f_x = [f(z[i], sigma) for i in range(A)]
 value_list2 = [[z[i] for i in range(A)], [f_x[i] for i in range(A)], [fn[i] for i in range(A)]]
-column_list2 = ["[" + str(boards[i-1]) + "," + str(boards[i]) + ")" for i in range(1, A + 1)]
+column_list2 = ["i=" + str(i) + " " + "[" + str(boards[i - 1]) + "," + str(boards[i]) + ")" for i in range(1, A + 1)]
 print(tabulate(value_list2, column_list2, tablefmt="grid"))
 
+Max_Ras=0
+Max_i=0
+for i in range (0,A):
+    t=abs(fn[i]-f_x[i])
+    if(t>=Max_Ras):
+        Max_Ras=t
+        Max_i=i
+
+print ("max(nj/(n*|Zi+1-Zi|)-fn(Zj)) = ", Max_Ras, "При  i = ", Max_i+1)
+
 fig1 = plt.figure(figsize=(12, 7))
-for i in range(1,A + 1):
-    x_temp = [boards[i-1], boards[i]]
-    y_temp = [fn[i-1], fn[i-1]]
+for i in range(1, A + 1):
+    x_temp = [boards[i - 1], boards[i]]
+    y_temp = [fn[i - 1], fn[i - 1]]
     plt.plot(x_temp, y_temp, 'black')
 plt.show()
-
-
